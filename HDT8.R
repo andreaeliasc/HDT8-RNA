@@ -109,3 +109,30 @@ head(test[,c(1:5,7,9)], 30)
 # Se obtiene la matriz de confusion para este modelo
 cfmWeka<-confusionMatrix(test$prediccionWeka,test$grupo)
 cfmWeka
+                      
+                      
+                      
+#weka2
+NB <- make_Weka_classifier("weka/classifiers/functions/MultilayerPerceptron")
+NB 
+WOW(NB)
+nnodos='4'
+
+modelo.bp<-NB(as.factor(grupo)~., data=train[,c(1:5,7)], control=Weka_control(H=nnodos, N=1000, G=TRUE), options=NULL)
+test$prediccionWeka<-predict(modelo.bp, newdata = test[,1:5])
+cfmWeka<-confusionMatrix(test$prediccionWeka,as.factor(test$grupo))
+cfmWeka
+
+corr <- data.frame(test$SalePrice,test$prediccionWeka)
+#####
+ #-------------------------------------------------
+# Red Neuronal con caret
+#-------------------------------------------------
+
+modeloCaret <- train(as.factor(group)~., data=train, method="nnet", trace=F)
+modeloCaret
+pc<-test$prediccionCaret<-predict(modeloCaret, newdata = test[,1:14])
+test$prediccionCaret
+cfmCaret<-confusionMatrix(as.factor(test$prediccionCaret),as.factor(test$group))
+cfmCaret
+corrN1 <- data.frame(test$SalePrice,test$prediccionCaret)
