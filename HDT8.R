@@ -73,3 +73,39 @@ test<-datos[-corte,]
 head(train)
 
 head(test)
+
+#-------------------------------------------------
+# Red Neuronal con nnet 
+#-------------------------------------------------
+
+modelo.nn2 <- nnet(grupo~.,data = train[,c(1:5,7)], size=6, rang=0.0000001,
+                   decay=5e-4, maxit=500) 
+modelo.nn2
+
+# Se realiza la prediccion con este modelo 
+prediccion2 <- as.data.frame(predict(modelo.nn2, newdata = test[,1:5]))
+columnaMasAlta<-apply(prediccion2, 1, function(x) colnames(prediccion2)[which.max(x)])
+columnaMasAlta
+test$prediccion2<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+head(test, 30)
+
+# Se obtiene la matriz de confusion para este modelo 
+cfm<-confusionMatrix(as.factor(test$prediccion2),test$grupo)
+cfm
+
+#-------------------------------------------------
+# Red Neuronal con RWeka 
+#-------------------------------------------------
+NB <- make_Weka_classifier("weka/classifiers/functions/MultilayerPerceptron")
+NB 
+WOW(NB)
+nnodos='6'
+
+modelo.bp<-NB(grupo~., data = train[,c(1:5,7)], control=Weka_control(H=nnodos, N=4000, G=TRUE), options=NULL)
+
+# Se realiza la prediccion con este modelo 
+test$prediccionWeka<-predict(modelo.bp, newdata = test[,1:5])
+head(test[,c(1:5,7,9)], 30)
+# Se obtiene la matriz de confusion para este modelo
+cfmWeka<-confusionMatrix(test$prediccionWeka,test$grupo)
+cfmWeka
