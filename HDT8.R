@@ -136,3 +136,68 @@ test$prediccionCaret
 cfmCaret<-confusionMatrix(as.factor(test$prediccionCaret),as.factor(test$group))
 cfmCaret
 corrN1 <- data.frame(test$SalePrice,test$prediccionCaret)
+                      
+                      
+# Prepare test and train sets
+random_draw <- sample(1:nrow(datos), size = 100)
+X_train     <- datos[random_draw, 1:4]
+y_train     <- datos[random_draw, 5]
+X_test      <- datos[setdiff(1:nrow(datos), random_draw), 1:4]
+y_test      <- datos[setdiff(1:nrow(datos), random_draw), 5]
+
+
+# Train neural network on classification task
+NN <- neuralnetwork(X = X_train, y = y_train, hidden.layers = c(5, 5),
+                    , activ.functions = "relu" , optim.type = 'adam', learn.rates = 0.01, val.prop = 0 )
+
+# Plot the loss during training
+plot(NN)
+
+# Make predictions
+y_pred <- predict(NN, newdata = X_test)
+View(y_pred)
+
+# Plot predictions
+correct <- (y_test == y_pred$predictions)
+plot(X_test, pch = as.numeric(y_test), col = correct + 2)
+
+cfm<-confusionMatrix(as.factor(test$correct),test$grupo)
+cfm
+
+prediccion3 <- as.data.frame(predict(NN, newdata = test[,1:4]))
+columnaMasAlta<-apply(prediccion3, 1, function(x) colnames(prediccion2)[which.max(x)])
+columnaMasAlta
+test$prediccion3<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+head(test, 30)
+#Modelo 2
+
+random_draw2 <- sample(1:nrow(datos), size = 100)
+X_train     <- datos[random_draw2, 1:4]
+y_train     <- datos[random_draw2, 5]
+X_test      <- datos[setdiff(1:nrow(datos), random_draw2), 1:4]
+y_test      <- datos[setdiff(1:nrow(datos), random_draw2), 5]
+
+
+# Train neural network on classification task
+NN <- neuralnetwork(X = X_train, y = y_train, hidden.layers = c(5, 5),
+                    , activ.functions = "tanh" , optim.type = 'adam', learn.rates = 0.01, val.prop = 0 )
+
+# Plot the loss during training
+plot(NN)
+
+# Make predictions
+y_pred <- predict(NN, newdata = X_test)
+View(y_pred)
+
+# Plot predictions
+correct <- (y_test == y_pred$predictions)
+plot(X_test, pch = as.numeric(y_test), col = correct + 2)
+
+cfmax<-confusionMatrix(as.factor(test$correct),test$prediccion4)
+cfmax
+
+prediccion4 <- as.data.frame(predict(NN, newdata = test[,1:4]))
+columnaMasAlta<-apply(prediccion4, 1, function(x) colnames(prediccion2)[which.max(x)])
+columnaMasAlta
+test$prediccion4<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+head(test, 30)
